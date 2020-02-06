@@ -13,7 +13,7 @@ export class CaliperService {
     this.client = this.initializeClient();
     this.session = this.startSession();
     
-    this.sensor.registerClient(client);
+    this.sensor.registerClient(this.client);
   }
   
   private initializeClient() {
