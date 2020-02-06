@@ -6,6 +6,7 @@ import { Course } from "./course";
 import environment from "../environment";
 import { AnalyticsService } from "./analytics-service";
 import { decrypt, encrypt } from "./utils";
+import { CaliperService} from "./caliper-service";
 
 const authLevels = {
   course: 4,
@@ -32,7 +33,7 @@ export class AuthService {
     scope: "openid"
   });
 
-  constructor(private router: Router, private analyticsService: AnalyticsService) {
+  constructor(private router: Router, private analyticsService: AnalyticsService, private caliperService: CaliperService) {
     this.authNotifier.setMaxListeners(21);
   }
 
@@ -77,6 +78,7 @@ export class AuthService {
           localStorage.setItem("infoextraplus", nickname);
           const url = localStorage.getItem("course_url");
           self.analyticsService.login(user.name, user.email, id, user.picture, url, user.nickname);
+          self.caliperService.logStartSessionEvent(id, url);
         });
 
         this.setSession(authResult);
