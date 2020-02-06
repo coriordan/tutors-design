@@ -19,7 +19,7 @@
     "auth0-js": "^9.11.2",
     "crypto-js": "^3.1.9-1",
     "firebase": "^7.8.0",
-    "ims-caliper": "^1.1.0",
+    "ims-caliper": "github:coriordan/ims-caliper#master",
     "remove-markdown": "^0.3.0",
     "showdown": "^1.9.0",
     "showdown-highlight": "^2.1.3",
