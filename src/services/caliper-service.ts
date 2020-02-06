@@ -1,39 +1,47 @@
-import * as caliper from 'caliper-ims';
+import * as Caliper from 'ims-caliper';
 import environment from "../environment";
 
 export class CaliperService {
-  private sensor : caliper.Sensor;
-  private session : caliper.Session;
+  private sensor : Caliper.Sensor;
+  private session : Caliper.Session;
+  private client : Caliper.HttpClient;
   // private person : caliper.Person;
   // private application : caliper.SoftwareApplication;
   
   constructor() {
-    sensor = initializeSensor();
-    session = startSession();
+    this.sensor = this.initializeSensor();
+    this.client = this.initializeClient();
+    this.session = this.startSession();
+    
+    this.sensor.registerClient(client);
   }
   
-  private initializeSensor() {
-    let sensor = caliper.Sensor;
-    sensor.initialize(environment.caliper.appIRI.concat("/sensors/1"));
-    
-    let client = caliper.Clients.HttpClient;
+  private initializeClient() {
+    let client = Caliper.HttpClient;
     
     let options = {
       uri: environment.caliper.endpoint,
       json: true
     };
+
+    client.initialize(this.sensor.getId().concat("/clients/1"), Object.assign(Caliper.HttpOptions, options));
     
-    client.initialize(sensor.id.concat("/clients/1"), options);
-    sensor.registerClient(client);
-    
+    return client;
+  }
+  
+  private initializeSensor() {
+    let sensor = Caliper.Sensor;
+
+    sensor.initialize(environment.caliper.appIRI.concat("/sensors/1"));
+
     return sensor;
   }
   
   private startSession() {
     let sessionStart = new Date().toISOString();
-    let sessionId = caliper.Validator.generateUUID;
+    let sessionId = Caliper.Validator.generateUUID();
     
-    let session = caliper.EntityFactory().create(caliper.Session, {
+    let session = Caliper.EntityFactory().create(Caliper.Session, {
       id: environment.caliper.appIRI.concat(`/${sessionId}`),
       name: `session-${sessionId}`,
       dateCreated: sessionStart,
@@ -46,16 +54,35 @@ export class CaliperService {
   logStartSessionEvent(userId: string, courseUrl: string) {
     // attribute logged in user to current session object
     this.session.user = userId;
-    let sessionEventId = caliper.Validator.generateUUID;
+    let sessionEventId = Caliper.Validator.generateUUID();
     
-    let event = caliper.EventFactory().create(caliper.SessionEvent, {
+    let event = Caliper.EventFactory().create(Caliper.SessionEvent, {
       id: sessionEventId,
       actor: userId,
-      action: caliper.Actions.LoggedIn.term,
-      object: caliper.appIRI,
+      action: Caliper.Actions.loggedIn.term,
+      object: environment.caliper.appIRI,
       eventTime: new Date().toISOString(),
       target: courseUrl,
-      edApp: caliper.appIRI,
+      edApp: environment.caliper.appIRI,
+      session: this.session
+    });
+    
+    this.sendEvent(event);
+  }
+  
+  logEndSessionEvent(userId: string, courseUrl: string) {
+    // attribute logged in user to current session object
+    this.session.user = userId;
+    let sessionEventId = Caliper.Validator.generateUUID();
+    
+    let event = Caliper.EventFactory().create(Caliper.SessionEvent, {
+      id: sessionEventId,
+      actor: userId,
+      action: Caliper.Actions.LoggedOut.term,
+      object: environment.caliper.appIRI,
+      eventTime: new Date().toISOString(),
+      target: courseUrl,
+      edApp: environment.caliper.appIRI,
       session: this.session
     });
     
@@ -64,17 +91,16 @@ export class CaliperService {
   
   sendEvent(event: caliper.Event) {
     var data = [];
-    date.push(event);
+    data.push(event);
     
-    let opts {
-      sensor: this.sensor.id,
+    let opts = {
+      sensor: this.sensor.getId(),
       sendTime: new Date().toISOString(),
       dataVersion: "http://purl.imsglobal.org/ctx/caliper/v1p1",
       data: data
     };
     
     let envelope = this.sensor.createEnvelope(opts);
-    
-    sensor.sendToClient(envelope);
+    this.sensor.sendToClient(this.client, envelope);
   } 
 }
