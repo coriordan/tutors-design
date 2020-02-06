@@ -105,6 +105,10 @@ export class AuthService {
   }
 
   logout() {
+    const id = localStorage.getItem("id");
+    const url = localStorage.getItem("course_url");
+    this.caliperService.logEndSessionEvent(id, url);
+    
     localStorage.removeItem("course_url");
     localStorage.removeItem("access_token");
     localStorage.removeItem("id_token");
@@ -112,6 +116,7 @@ export class AuthService {
     localStorage.removeItem("id");
     localStorage.removeItem("info");
     this.authNotifier.emit("authChange", false);
+    
   }
 
   isAuthenticated() {

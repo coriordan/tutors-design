@@ -78,7 +78,7 @@ export class CaliperService {
     let event = Caliper.EventFactory().create(Caliper.SessionEvent, {
       id: sessionEventId,
       actor: userId,
-      action: Caliper.Actions.LoggedOut.term,
+      action: Caliper.Actions.loggedOut.term,
       object: environment.caliper.appIRI,
       eventTime: new Date().toISOString(),
       target: courseUrl,
