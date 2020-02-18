@@ -5,7 +5,7 @@ export class CaliperService {
   private sensor : Caliper.Sensor;
   private session : Caliper.Session;
   private client : Caliper.HttpClient;
-  // private person : caliper.Person;
+  private person : Caliper.Person;
   // private application : caliper.SoftwareApplication;
   
   constructor() {
@@ -37,6 +37,9 @@ export class CaliperService {
     return sensor;
   }
   
+  /**
+  * Initialise Caliper Session object
+  */
   private startSession() {
     let sessionStart = new Date().toISOString();
     let sessionId = Caliper.Validator.generateUUID();
@@ -50,15 +53,33 @@ export class CaliperService {
     
     return session;
   }
-    
+  
+  private createPerson(userId: string) {
+    let person = Caliper.EntityFactory().create(Caliper.Person, {
+      id: environment.caliper.appIRI.concat(`/users/${userId}`),
+      name: userId
+    });
+  
+    return person;
+  }
+  
+  private initializePerson(userId: string) {
+    this.person = this.createPerson(userId);
+    this.session.user = this.person;
+  }
+  
+  /**
+  * Record Log in to application event
+  */  
   logStartSessionEvent(userId: string, courseUrl: string) {
     // attribute logged in user to current session object
-    this.session.user = userId;
+    this.initializePerson(userId);
+    
     let sessionEventId = Caliper.Validator.generateUUID();
     
     let event = Caliper.EventFactory().create(Caliper.SessionEvent, {
       id: sessionEventId,
-      actor: userId,
+      actor: this.person,
       action: Caliper.Actions.loggedIn.term,
       object: environment.caliper.appIRI,
       eventTime: new Date().toISOString(),
@@ -70,14 +91,15 @@ export class CaliperService {
     this.sendEvent(event);
   }
   
+  /**
+  * Record Log out from application event
+  */  
   logEndSessionEvent(userId: string, courseUrl: string) {
-    // attribute logged in user to current session object
-    this.session.user = userId;
     let sessionEventId = Caliper.Validator.generateUUID();
     
     let event = Caliper.EventFactory().create(Caliper.SessionEvent, {
       id: sessionEventId,
-      actor: userId,
+      actor: this.person,
       action: Caliper.Actions.loggedOut.term,
       object: environment.caliper.appIRI,
       eventTime: new Date().toISOString(),
@@ -87,6 +109,7 @@ export class CaliperService {
     });
     
     this.sendEvent(event);
+    this.session = null;
   }
   
   sendEvent(event: caliper.Event) {
