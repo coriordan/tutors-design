@@ -6,13 +6,14 @@ export class CaliperService {
   private session : Caliper.Session;
   private client : Caliper.HttpClient;
   private person : Caliper.Person;
-  // private application : caliper.SoftwareApplication;
+  private application : Caliper.SoftwareApplication;
   
   constructor() {
     this.sensor = this.initializeSensor();
     this.client = this.initializeClient();
+    this.application = this.initializeApplication();
     this.session = this.startSession();
-    
+
     this.sensor.registerClient(this.client);
   }
   
@@ -68,6 +69,18 @@ export class CaliperService {
     this.session.user = this.person;
   }
   
+  private initializeApplication() {
+    let application = Caliper.EntityFactory().create(Caliper.SoftwareApplication, {
+      id: environment.caliper.appIRI,
+      type: Caliper.EntityType.softwareApplication.term,
+      name: "Tutors"
+    });
+    
+    console.log(application);
+    
+    return application;
+  }
+  
   /**
   * Record Log in to application event
   */  
@@ -81,7 +94,7 @@ export class CaliperService {
       id: sessionEventId,
       actor: this.person,
       action: Caliper.Actions.loggedIn.term,
-      object: environment.caliper.appIRI,
+      object: this.application,
       eventTime: new Date().toISOString(),
       target: courseUrl,
       edApp: environment.caliper.appIRI,
@@ -101,10 +114,10 @@ export class CaliperService {
       id: sessionEventId,
       actor: this.person,
       action: Caliper.Actions.loggedOut.term,
-      object: environment.caliper.appIRI,
+      object: courseUrl,
       eventTime: new Date().toISOString(),
       target: courseUrl,
-      edApp: environment.caliper.appIRI,
+      edApp: this.application,
       session: this.session
     });
     
