@@ -81,6 +81,21 @@ export class CaliperService {
     return application;
   }
   
+  private sendEvent(event: caliper.Event) {
+    var data = [];
+    data.push(event);
+    
+    let opts = {
+      sensor: this.sensor.getId(),
+      sendTime: new Date().toISOString(),
+      dataVersion: "http://purl.imsglobal.org/ctx/caliper/v1p1",
+      data: data
+    };
+    
+    let envelope = this.sensor.createEnvelope(opts);
+    this.sensor.sendToClient(this.client, envelope);
+  } 
+  
   /**
   * Record Log in to application event
   */  
@@ -125,18 +140,5 @@ export class CaliperService {
     this.session = null;
   }
   
-  sendEvent(event: caliper.Event) {
-    var data = [];
-    data.push(event);
-    
-    let opts = {
-      sensor: this.sensor.getId(),
-      sendTime: new Date().toISOString(),
-      dataVersion: "http://purl.imsglobal.org/ctx/caliper/v1p1",
-      data: data
-    };
-    
-    let envelope = this.sensor.createEnvelope(opts);
-    this.sensor.sendToClient(this.client, envelope);
-  } 
+
 }
