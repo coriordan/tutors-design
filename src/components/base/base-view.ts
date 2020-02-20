@@ -35,6 +35,7 @@ export class BaseView {
   anaylticsService: AnalyticsService;
   ea : EventAggregator;
   metricsService : MetricsService;
+  course : Course;
 
   constructor(
     courseRepo: CourseRepo,
@@ -56,13 +57,16 @@ export class BaseView {
     this.caliperService = caliperService;
   }
 
-  async init(path: string, lo: Lo = null) {
+  async init(path: string = "", lo: Lo = null) {
     let type = "course";
     if (lo) {
       type = lo.type;
     }
-    this.show = this.authService.checkAuth(this.courseRepo.course, type);
-    this.navigatorProperties.init(this.courseRepo.course);
+    if (this.courseRepo.course) {
+      this.course = this.courseRepo.course;
+      this.show = this.authService.checkAuth(this.courseRepo.course, type);
+      this.navigatorProperties.init(this.courseRepo.course);
+    }
     if (lo) {
       this.anaylticsService.log(path, this.courseRepo.course, lo);
       this.caliperService.logNavigatedToEvent(this.courseRepo.course, lo);
@@ -73,5 +77,24 @@ export class BaseView {
       currentCourse = this.courseRepo.course;
       analyticsService = this.anaylticsService;
     }
+    this.configMainNav(this.navigatorProperties);
+  }
+
+  configMainNav(nav: NavigatorProperties) {
+    nav.clear();
+    nav.config(
+      {
+        titleCard: true,
+        parent: false,
+        profile: false,
+        companions: false,
+        walls: false,
+        tutorsTime: false
+      },
+      {
+        title: "Tutors Tuition System",
+        subtitle: "Eamonn de Leastar, WIT Computing"
+      }
+    );
   }
 }
