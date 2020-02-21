@@ -126,4 +126,10 @@ export class AuthService {
     }
     return false;
   }
+
+  getUserEmail() {
+    const id = localStorage.getItem("id");
+    const email = decrypt(id);
+    return email;
+  }
 }
