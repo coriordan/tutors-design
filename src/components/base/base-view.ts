@@ -78,8 +78,7 @@ export class BaseView {
       analyticsService = this.anaylticsService;
     }
     this.configMainNav(this.navigatorProperties);
-    this.navigatorProperties.companions.visible = this.navigatorProperties.companions.nav.length > 0;
-    this.navigatorProperties.profile.visible = this.course.walls.get("lab") != null && this.authService.isAuthenticated();
+    this.autoNavProperties();
   }
 
   configMainNav(nav: NavigatorProperties) {
@@ -98,5 +97,9 @@ export class BaseView {
         subtitle: "Eamonn de Leastar, WIT Computing"
       }
     );
+  }
+  autoNavProperties () {
+    this.navigatorProperties.companions.visible = this.navigatorProperties.companions.visible && this.navigatorProperties.companions.nav.length > 0;
+    this.navigatorProperties.profile.visible = this.course.authLevel > 0 && this.course.walls.get("lab") != null && this.authService.isAuthenticated();
   }
 }
