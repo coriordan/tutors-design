@@ -5,8 +5,9 @@ import { inject } from "aurelia-framework";
 import { Lo } from "../../services/lo";
 import { Router } from "aurelia-router";
 import { AnalyticsService } from "../../services/analytics-service";
+import { CaliperService} from "../../services/caliper-service";
 
-@inject(CourseRepo, NavigatorProperties, AuthService, Router, AnalyticsService)
+@inject(CourseRepo, NavigatorProperties, AuthService, Router, AnalyticsService, CaliperService)
 export class BaseView {
   show = false;
 
@@ -21,13 +22,15 @@ export class BaseView {
     navigatorProperties: NavigatorProperties,
     authService: AuthService,
     router: Router,
-    analyticsService: AnalyticsService
+    analyticsService: AnalyticsService,
+    caliperService: CaliperService
   ) {
     this.courseRepo = courseRepo;
     this.navigatorProperties = navigatorProperties;
     this.authService = authService;
     this.router = router;
     this.anaylticsService = analyticsService;
+    this.caliperService = caliperService;
   }
 
   async init(path: string, lo: Lo = null) {
@@ -39,6 +42,7 @@ export class BaseView {
     if (lo) {
       this.navigatorProperties.init(lo);
       this.anaylticsService.log(path, this.courseRepo.course, lo);
+      this.caliperService.logNavigatedToEvent(this.courseRepo.course, lo);
       this.router.title = lo.title;
       this.router.updateTitle();
     }
