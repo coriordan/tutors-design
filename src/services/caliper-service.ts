@@ -257,114 +257,188 @@ export class CaliperService {
     this.sendEvent(event);
   }
   
+  /**
+  * Record video started event
+  */
   logVideoStartedEvent(playerAPI) {
-    console.log('ytplayer:state:playing');
-    console.log(playerAPI);
-    console.log(playerAPI.player.getVideoUrl());
-    console.log(playerAPI.player.getDuration());
-    
     let mediaEventId = Caliper.Validator.generateUUID();
     let actor = this.getActor();
-    
+
     let obj = Caliper.EntityFactory().create(Caliper.VideoObject, {
-      id: environment.caliper.appIRI.concat(`/video/${playerAPI.player.playerInfo.videoUrl}`),
+      id: environment.caliper.appIRI.concat(`/video/${playerAPI.player.playerInfo.videoData.video_id}`),
       name: playerAPI.player.playerInfo.videoData.title,
+      description: playerAPI.player.playerInfo.videoUrl,
       duration: new Date(playerAPI.player.playerInfo.duration * 1000).toISOString().substr(11, 8),
       creators: [playerAPI.player.playerInfo.videoData.author] 
     });
+
+    let currentTime = new Date(playerAPI.player.playerInfo.currentTime * 1000).toISOString().substr(11, 11);
     
-    console.log(obj);
-    
+    let target = Caliper.EntityFactory().create(Caliper.MediaLocation, {
+      id: environment.caliper.appIRI.concat(`/medialocation/${encodeURIComponent(currentTime)}`),
+      currentTime: currentTime,
+      dateCreated: new Date().toISOString()
+    });
+
     let event = eventFactory().create(Caliper.MediaEvent, {
       id: mediaEventId,
       actor: actor,
       action: Caliper.Actions.started.term,
       object: obj,
+      target: target,
       eventTime: new Date().toISOString(),
       edApp: this.application,
       session: this.session
     });
-    
+ 
     this.sendEvent(event);
   }
   
+  /**
+  * Record video paused event
+  */
   logVideoPausedEvent(playerAPI) {
-    console.log('ytplayer:state:paused');
-    
-    // let mediaEventId = Caliper.Validator.generateUUID();
-//     let actor = this.getActor();
-//
-//     let event = eventFactory().create(Caliper.MediaEvent, {
-//       id: mediaEventId,
-//       actor: actor,
-//       action: Caliper.Actions.paused.term,
-//       object: ,
-//       eventTime: new Date().toISOString(),
-//       target: ,
-//       edApp: this.application,
-//       session: this.session
-//     });
-//
-//     this.sendEvent(event);
+    let mediaEventId = Caliper.Validator.generateUUID();
+    let actor = this.getActor();
+
+    let obj = Caliper.EntityFactory().create(Caliper.VideoObject, {
+      id: environment.caliper.appIRI.concat(`/video/${playerAPI.player.playerInfo.videoData.video_id}`),
+      name: playerAPI.player.playerInfo.videoData.title,
+      description: playerAPI.player.playerInfo.videoUrl,
+      duration: new Date(playerAPI.player.playerInfo.duration * 1000).toISOString().substr(11, 8),
+      creators: [playerAPI.player.playerInfo.videoData.author] 
+    });
+
+    let currentTime = new Date(playerAPI.player.playerInfo.currentTime * 1000).toISOString().substr(11, 11);
+
+    let target = Caliper.EntityFactory().create(Caliper.MediaLocation, {
+      id: environment.caliper.appIRI.concat(`/medialocation/${encodeURIComponent(currentTime)}`),
+      currentTime: currentTime,
+      dateCreated: new Date().toISOString()
+    });
+
+    let event = eventFactory().create(Caliper.MediaEvent, {
+      id: mediaEventId,
+      actor: actor,
+      action: Caliper.Actions.paused.term,
+      object: obj,
+      target: target,
+      eventTime: new Date().toISOString(),
+      edApp: this.application,
+      session: this.session
+    });
+
+    this.sendEvent(event);
   }
   
+  /**
+  * Record video ended event
+  */
   logVideoEndedEvent(playerAPI) {
-    console.log('ytplayer:state:ended');
-    
-    // let mediaEventId = Caliper.Validator.generateUUID();
-//     let actor = this.getActor();
-//
-//     let event = eventFactory().create(Caliper.MediaEvent, {
-//       id: mediaEventId,
-//       actor: actor,
-//       action: Caliper.Actions.ended.term,
-//       object: ,
-//       eventTime: new Date().toISOString(),
-//       target: ,
-//       edApp: this.application,
-//       session: this.session
-//     });
-//
-//     this.sendEvent(event);
+    let mediaEventId = Caliper.Validator.generateUUID();
+    let actor = this.getActor();
+
+    let obj = Caliper.EntityFactory().create(Caliper.VideoObject, {
+      id: environment.caliper.appIRI.concat(`/video/${playerAPI.player.playerInfo.videoData.video_id}`),
+      name: playerAPI.player.playerInfo.videoData.title,
+      description: playerAPI.player.playerInfo.videoUrl,
+      duration: new Date(playerAPI.player.playerInfo.duration * 1000).toISOString().substr(11, 8),
+      creators: [playerAPI.player.playerInfo.videoData.author] 
+    });
+
+    let currentTime = new Date(playerAPI.player.playerInfo.currentTime * 1000).toISOString().substr(11, 11);
+
+    let target = Caliper.EntityFactory().create(Caliper.MediaLocation, {
+      id: environment.caliper.appIRI.concat(`/medialocation/${encodeURIComponent(currentTime)}`),
+      currentTime: currentTime,
+      dateCreated: new Date().toISOString()
+    });
+
+    let event = eventFactory().create(Caliper.MediaEvent, {
+      id: mediaEventId,
+      actor: actor,
+      action: Caliper.Actions.ended.term,
+      object: obj,
+      target: target,
+      eventTime: new Date().toISOString(),
+      edApp: this.application,
+      session: this.session
+    });
+
+    this.sendEvent(event);
   }
   
-  logVideoChangeResolutionEvent(resolution) {
-    console.log('ytplayer:quality:change' + resolution);
-    
-    // let mediaEventId = Caliper.Validator.generateUUID();
-    // let actor = this.getActor();
-    //
-    // let event = eventFactory().create(Caliper.MediaEvent, {
-    //   id: mediaEventId,
-    //   actor: actor,
-    //   action: Caliper.Actions.changedResolution.term,
-    //   object: ,
-    //   eventTime: new Date().toISOString(),
-    //   target: ,
-    //   edApp: this.application,
-    //   session: this.session
-    // });
-    //
-    // this.sendEvent(event);
+  /**
+  * Record video resolution changed event
+  */
+  logVideoChangeResolutionEvent(playerAPI) {
+    let mediaEventId = Caliper.Validator.generateUUID();
+    let actor = this.getActor();
+
+    let obj = Caliper.EntityFactory().create(Caliper.VideoObject, {
+      id: environment.caliper.appIRI.concat(`/video/${playerAPI.player.playerInfo.videoData.video_id}`),
+      name: playerAPI.player.playerInfo.videoData.title,
+      description: playerAPI.player.playerInfo.videoUrl,
+      duration: new Date(playerAPI.player.playerInfo.duration * 1000).toISOString().substr(11, 8),
+      creators: [playerAPI.player.playerInfo.videoData.author] 
+    });
+
+    let currentTime = new Date(playerAPI.player.playerInfo.currentTime * 1000).toISOString().substr(11, 11);
+
+    let target = Caliper.EntityFactory().create(Caliper.MediaLocation, {
+      id: environment.caliper.appIRI.concat(`/medialocation/${encodeURIComponent(currentTime)}`),
+      currentTime: currentTime,
+      dateCreated: new Date().toISOString()
+    });
+
+    let event = eventFactory().create(Caliper.MediaEvent, {
+      id: mediaEventId,
+      actor: actor,
+      action: Caliper.Actions.changedResolution.term,
+      object: obj,
+      target: target,
+      eventTime: new Date().toISOString(),
+      edApp: this.application,
+      session: this.session
+    });
+
+    this.sendEvent(event);
   }
-  
-  logVideoChangeSpeedEvent(speed) {
-    console.log('ytplayer:rate:change' + speed);
+
+  /**
+  * Record video playback speed changed event
+  */
+  logVideoChangeSpeedEvent(playerAPI) {
+    let mediaEventId = Caliper.Validator.generateUUID();
+    let actor = this.getActor();
+
+    let obj = Caliper.EntityFactory().create(Caliper.VideoObject, {
+      id: environment.caliper.appIRI.concat(`/video/${playerAPI.player.playerInfo.videoData.video_id}`),
+      name: playerAPI.player.playerInfo.videoData.title,
+      description: playerAPI.player.playerInfo.videoUrl,
+      duration: new Date(playerAPI.player.playerInfo.duration * 1000).toISOString().substr(11, 8),
+      creators: [playerAPI.player.playerInfo.videoData.author] 
+    });
+
+    let currentTime = new Date(playerAPI.player.playerInfo.currentTime * 1000).toISOString().substr(11, 11);
     
-    // let mediaEventId = Caliper.Validator.generateUUID();
-   //  let actor = this.getActor();
-   //
-   //  let event = eventFactory().create(Caliper.MediaEvent, {
-   //    id: mediaEventId,
-   //    actor: actor,
-   //    action: Caliper.Actions.changedSpeed.term,
-   //    object: ,
-   //    eventTime: new Date().toISOString(),
-   //    target: ,
-   //    edApp: this.application,
-   //    session: this.session
-   //  });
-   //
-   //  this.sendEvent(event);
+    let target = Caliper.EntityFactory().create(Caliper.MediaLocation, {
+      id: environment.caliper.appIRI.concat(`/medialocation/${encodeURIComponent(currentTime)}`),
+      currentTime: currentTime,
+      dateCreated: new Date().toISOString()
+    });
+
+    let event = eventFactory().create(Caliper.MediaEvent, {
+      id: mediaEventId,
+      actor: actor,
+      action: Caliper.Actions.changedSpeed.term,
+      object: obj,
+      target: target,
+      eventTime: new Date().toISOString(),
+      edApp: this.application,
+      session: this.session
+    });
+
+    this.sendEvent(event);
   }
 }
