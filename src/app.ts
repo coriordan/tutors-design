@@ -5,12 +5,20 @@ import { autoinject } from "aurelia-framework";
 import { CourseRepo } from "./services/course-repo";
 import { NavigatorProperties } from "./resources/elements/navigators/navigator-properties";
 import { AuthService } from "./services/auth-service";
+import {EventAggregator} from 'aurelia-event-aggregator';
+import * as load from 'load-script';
+
 
 @autoinject
 export class App {
   title = 'Tutors';
 
-  constructor(private navigatorProperties: NavigatorProperties, private courseRepo : CourseRepo) {}
+  constructor(private navigatorProperties: NavigatorProperties, private courseRepo : CourseRepo, eventAggregator: EventAggregator) {
+    this.eventAggregator = eventAggregator;
+    this.eventAggregator.subscribe('ytplayer:init:getScript', payload => {
+      load(payload.data);
+    });
+  }
 
   configureRouter(config: RouterConfiguration, router: Router) {
     config.title = 'Tutors';

@@ -1,6 +1,6 @@
 <template>
   <require from="../iconography/icon"></require>
-
+  <require from="../../attributes/yt-player"></require>    
   <div class="uk-card uk-card-default uk-box-shadow-xlarge uk-animation-scale-up">
     <div class="uk-card-header">
       <div uk-grid>
@@ -12,8 +12,8 @@
         </div>
       </div>
     </div>
-    <div class="uk-card-media-top">
-      <iframe width="1920" height="1080" src="https://www.youtube.com/embed/${videoid}" allow="autoplay; encrypted-media" allowfullscreen uk-responsive></iframe>
+    <div class="uk-card-media-top" style="overflow: hidden; padding-top: 56.25%; position: relative">
+      <div yt-player="${videoid}" style="border: 0; height: 100%; left: 0; position: absolute; top: 0; width: 100%"></div>
     </div>
   </div>
 </template>
