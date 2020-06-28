@@ -73,17 +73,17 @@ export class CaliperService {
     return session;
   }
 
-  private createPerson(userId: string) {
+  private createPerson(userId: string, email: string) {
     let person = Caliper.EntityFactory().create(Caliper.Person, {
       id: environment.caliper.appIRI.concat(`/users/${userId}`),
-      name: userId
+      name: email
     });
 
     return person;
   }
 
-  private initializePerson(userId: string) {
-    this.person = this.createPerson(userId);
+  private initializePerson(userId: string, email: string) {
+    this.person = this.createPerson(userId, email);
     this.session.user = this.person;
   }
 
@@ -194,23 +194,30 @@ export class CaliperService {
   /**
   * Record Log in to application event
   */  
-  logStartSessionEvent(userId: string, courseUrl: string) {
+  logStartSessionEvent(userId: string, email: string, courseUrl: string) {
     // attribute logged in user to current session object
-    this.initializePerson(userId);
+    this.initializePerson(userId, email);
     let sessionEventId = Caliper.Validator.generateUUID();
     let actor = this.getActor();
-
+    
+    let target = Caliper.EntityFactory().create(Caliper.DigitalResource, {
+      id: environment.caliper.appIRI.concat(`/page/${courseUrl}`),
+      name: courseUrl
+    });
+    
     let event = Caliper.EventFactory().create(Caliper.SessionEvent, {
       id: sessionEventId,
       actor: actor,
       action: Caliper.Actions.loggedIn.term,
       object: this.application,
       eventTime: new Date().toISOString(),
-      target: courseUrl,
+      target: target,
       edApp: environment.caliper.appIRI,
       session: this.session
     });
-
+    
+    console.log(event);
+    
     this.sendEvent(event);
   }
 
@@ -221,13 +228,18 @@ export class CaliperService {
     let sessionEventId = Caliper.Validator.generateUUID();
     let actor = this.getActor();
     
+    let target = Caliper.EntityFactory().create(Caliper.DigitalResource, {
+      id: environment.caliper.appIRI.concat(`/page/${courseUrl}`),
+      name: courseUrl
+    });
+    
     let event = Caliper.EventFactory().create(Caliper.SessionEvent, {
       id: sessionEventId,
       actor: actor,
       action: Caliper.Actions.loggedOut.term,
-      object: courseUrl,
+      object: this.application,
       eventTime: new Date().toISOString(),
-      target: courseUrl,
+      target: target,
       edApp: this.application,
       session: this.session
     });
@@ -253,7 +265,9 @@ export class CaliperService {
       edApp: this.application,
       session: this.session 
     });
-
+    
+    console.log(event);
+    
     this.sendEvent(event);
   }
   
@@ -263,13 +277,12 @@ export class CaliperService {
   logVideoStartedEvent(playerAPI) {
     let mediaEventId = Caliper.Validator.generateUUID();
     let actor = this.getActor();
-
+    
     let obj = Caliper.EntityFactory().create(Caliper.VideoObject, {
       id: environment.caliper.appIRI.concat(`/video/${playerAPI.player.playerInfo.videoData.video_id}`),
       name: playerAPI.player.playerInfo.videoData.title,
       description: playerAPI.player.playerInfo.videoUrl,
-      duration: new Date(playerAPI.player.playerInfo.duration * 1000).toISOString().substr(11, 8),
-      creators: [playerAPI.player.playerInfo.videoData.author] 
+      duration: new Date(playerAPI.player.playerInfo.duration * 1000).toISOString().substr(11, 8)
     });
 
     let currentTime = new Date(playerAPI.player.playerInfo.currentTime * 1000).toISOString().substr(11, 11);
@@ -290,7 +303,7 @@ export class CaliperService {
       edApp: this.application,
       session: this.session
     });
- 
+    
     this.sendEvent(event);
   }
   
@@ -305,8 +318,7 @@ export class CaliperService {
       id: environment.caliper.appIRI.concat(`/video/${playerAPI.player.playerInfo.videoData.video_id}`),
       name: playerAPI.player.playerInfo.videoData.title,
       description: playerAPI.player.playerInfo.videoUrl,
-      duration: new Date(playerAPI.player.playerInfo.duration * 1000).toISOString().substr(11, 8),
-      creators: [playerAPI.player.playerInfo.videoData.author] 
+      duration: new Date(playerAPI.player.playerInfo.duration * 1000).toISOString().substr(11, 8)
     });
 
     let currentTime = new Date(playerAPI.player.playerInfo.currentTime * 1000).toISOString().substr(11, 11);
@@ -342,8 +354,7 @@ export class CaliperService {
       id: environment.caliper.appIRI.concat(`/video/${playerAPI.player.playerInfo.videoData.video_id}`),
       name: playerAPI.player.playerInfo.videoData.title,
       description: playerAPI.player.playerInfo.videoUrl,
-      duration: new Date(playerAPI.player.playerInfo.duration * 1000).toISOString().substr(11, 8),
-      creators: [playerAPI.player.playerInfo.videoData.author] 
+      duration: new Date(playerAPI.player.playerInfo.duration * 1000).toISOString().substr(11, 8)
     });
 
     let currentTime = new Date(playerAPI.player.playerInfo.currentTime * 1000).toISOString().substr(11, 11);
@@ -374,13 +385,12 @@ export class CaliperService {
   logVideoChangeResolutionEvent(playerAPI) {
     let mediaEventId = Caliper.Validator.generateUUID();
     let actor = this.getActor();
-
+    
     let obj = Caliper.EntityFactory().create(Caliper.VideoObject, {
       id: environment.caliper.appIRI.concat(`/video/${playerAPI.player.playerInfo.videoData.video_id}`),
       name: playerAPI.player.playerInfo.videoData.title,
       description: playerAPI.player.playerInfo.videoUrl,
-      duration: new Date(playerAPI.player.playerInfo.duration * 1000).toISOString().substr(11, 8),
-      creators: [playerAPI.player.playerInfo.videoData.author] 
+      duration: new Date(playerAPI.player.playerInfo.duration * 1000).toISOString().substr(11, 8)
     });
 
     let currentTime = new Date(playerAPI.player.playerInfo.currentTime * 1000).toISOString().substr(11, 11);
@@ -416,8 +426,7 @@ export class CaliperService {
       id: environment.caliper.appIRI.concat(`/video/${playerAPI.player.playerInfo.videoData.video_id}`),
       name: playerAPI.player.playerInfo.videoData.title,
       description: playerAPI.player.playerInfo.videoUrl,
-      duration: new Date(playerAPI.player.playerInfo.duration * 1000).toISOString().substr(11, 8),
-      creators: [playerAPI.player.playerInfo.videoData.author] 
+      duration: new Date(playerAPI.player.playerInfo.duration * 1000).toISOString().substr(11, 8)
     });
 
     let currentTime = new Date(playerAPI.player.playerInfo.currentTime * 1000).toISOString().substr(11, 11);

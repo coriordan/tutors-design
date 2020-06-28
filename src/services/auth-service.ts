@@ -78,7 +78,7 @@ export class AuthService {
           localStorage.setItem("infoextraplus", nickname);
           const url = localStorage.getItem("course_url");
           self.analyticsService.login(user.name, user.email, id, user.picture, url, user.nickname);
-          self.caliperService.logStartSessionEvent(id, url);
+          self.caliperService.logStartSessionEvent(user.id, user.email, url);
         });
 
         this.setSession(authResult);
